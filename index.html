@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Healthy Me</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Healthy Me</h1>
+      <p>Month Meal Planner</p>
+    </div>
+    <button id="resetBtn">Reset Checkmarks</button>
+  </header>
+
+  <nav>
+    <button class="tab active" data-tab="today">Today</button>
+    <button class="tab" data-tab="planner">Planner</button>
+    <button class="tab" data-tab="shopping">Shopping</button>
+    <button class="tab" data-tab="prep">Prep</button>
+  </nav>
+
+  <main>
+    <section id="today" class="panel active">
+      <h2>Today</h2>
+      <div id="todayCard" class="card"></div>
+    </section>
+
+    <section id="planner" class="panel">
+      <h2>30-Day Calendar</h2>
+      <div id="calendar" class="calendar"></div>
+    </section>
+
+    <section id="shopping" class="panel">
+      <h2>Shopping List</h2>
+      <p class="note">Built around repeat meals for easy shopping. Popcorn means your clean avocado-oil/no-seed-oil option.</p>
+      <div id="shoppingList" class="shopping"></div>
+    </section>
+
+    <section id="prep" class="panel">
+      <h2>Weekly Prep Checklist</h2>
+      <div id="prepList" class="card"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
