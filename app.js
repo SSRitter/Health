@@ -1,93 +1,31 @@
-const exclusions = ["Seafood/Fish","Raw onion","Avocados","Mushrooms","Pistachios","Spaghetti squash","Seed oils"];
-
-const pattern = [
-  {b:"3 eggs + whole-grain toast + blueberries", l:"Turkey sandwich + carrots + apple", s1:"Apple + almond butter", s2:"Clean avocado-oil popcorn"},
-  {b:"3 eggs + whole-grain toast + blueberries", l:"Turkey sandwich + carrots + apple", s1:"Apple + almond butter", s2:"Dairy-free yogurt + chia"},
-  {b:"Protein oatmeal + blueberries + chia", l:"Chicken rice bowl with broccoli + peppers", s1:"Hard-boiled eggs", s2:"Clean avocado-oil popcorn"},
-  {b:"3 eggs + whole-grain toast + blueberries", l:"Turkey sandwich + carrots + apple", s1:"Apple + almond butter", s2:"Walnuts"},
-  {b:"Protein oatmeal + blueberries + chia", l:"Big chicken salad + walnuts", s1:"Protein shake", s2:"Clean avocado-oil popcorn"},
-  {b:"Rainbow egg cups + berries", l:"Turkey chili + rice", s1:"Celery + almond butter", s2:"Roasted edamame"},
-  {b:"Rainbow egg cups + berries", l:"Chicken bowl leftovers", s1:"Dairy-free yogurt", s2:"Hard-boiled eggs"}
-];
-
-const plan = Array.from({length:30}, (_,i)=> ({day:i+1, ...pattern[i%7]}));
-
-const shopping = {
-  "Protein": ["Eggs: about 5 dozen/month","Chicken breast: 12–14 lb/month","Turkey breast slices: 4–5 lb/month","Lean ground turkey: 6–8 lb/month","Protein powder","Dairy-free yogurt","Roasted edamame"],
-  "Produce": ["Blueberries","Apples","Bananas if desired","Romaine","Spinach","Broccoli","Bell peppers","Tomatoes","Cucumbers","Carrots","Celery","Garlic","Lemons"],
-  "Carbs": ["Whole-grain or sourdough bread","Old-fashioned oats","Brown rice","Potatoes if desired"],
-  "Fats + Pantry": ["Almond butter","Walnuts","Chia seeds","Flaxseed","Olive oil","Avocado oil","Avocado-oil mayonnaise","Mustard","Balsamic vinegar","Marinara","Clean avocado-oil/no-seed-oil popcorn","Salt, pepper, garlic powder, cinnamon"]
-};
-
-const prep = [
-  "Cook 3–4 lb chicken breast.",
-  "Brown 2 lb lean ground turkey for chili/bowls.",
-  "Cook a large batch of brown rice.",
-  "Make 18–24 rainbow egg cups.",
-  "Hard boil 12 eggs.",
-  "Wash/chop romaine, carrots, celery, peppers, cucumbers.",
-  "Portion popcorn, walnuts, and apple/almond-butter snack packs.",
-  "Set out supplements for the week."
-];
-
-function key(day, item){ return `hm-day-${day}-${item}`; }
-function checked(day,item){ return localStorage.getItem(key(day,item)) === "1"; }
-function setChecked(day,item,val){ localStorage.setItem(key(day,item), val ? "1" : "0"); }
-
-function mealBlock(day, label, text, item){
-  return `<div class="meal"><label><input type="checkbox" ${checked(day,item)?"checked":""} onchange="setChecked(${day},'${item}',this.checked); renderToday();"><div><strong>${label}</strong><span>${text}</span></div></label></div>`;
-}
-
-function dayCard(d){
-  return `<div class="day"><h3>Day ${d.day}</h3>
-    ${mealBlock(d.day,"Breakfast",d.b,"b")}
-    ${mealBlock(d.day,"Lunch",d.l,"l")}
-    ${mealBlock(d.day,"Snack 1",d.s1,"s1")}
-    ${mealBlock(d.day,"Snack 2",d.s2,"s2")}
-  </div>`;
-}
-
-function renderCalendar(){ document.getElementById("calendar").innerHTML = plan.map(dayCard).join(""); }
-
-function renderShopping(){
-  document.getElementById("shoppingList").innerHTML = Object.entries(shopping).map(([section,items]) =>
-    `<div class="shop-section"><h3>${section}</h3><ul>${items.map(x=>`<li>${x}</li>`).join("")}</ul></div>`
-  ).join("");
-}
-
-function renderPrep(){
-  document.getElementById("prepList").innerHTML =
-    `<ul>${prep.map((x,i)=>`<li><label><input type="checkbox" ${localStorage.getItem("prep"+i)==="1"?"checked":""} onchange="localStorage.setItem('prep${i}',this.checked?'1':'0')"> ${x}</label></li>`).join("")}</ul>
-     <h3>Foods avoided</h3><p>${exclusions.join(" • ")}</p>`;
-}
-
-function renderToday(){
-  const todayIndex = ((new Date()).getDate()-1) % 30;
-  const d = plan[todayIndex];
-  const done = ["b","l","s1","s2"].filter(i=>checked(d.day,i)).length;
-  document.getElementById("todayCard").innerHTML =
-    `<h3>Day ${d.day}</h3><div class="progress"><div class="bar" style="width:${done/4*100}%"></div></div>
-     ${mealBlock(d.day,"Breakfast",d.b,"b")}
-     ${mealBlock(d.day,"Lunch",d.l,"l")}
-     ${mealBlock(d.day,"Snack 1",d.s1,"s1")}
-     ${mealBlock(d.day,"Snack 2",d.s2,"s2")}
-     <h3>Notes</h3><textarea placeholder="Energy, digestion, sleep, symptoms..." oninput="localStorage.setItem('notes-${d.day}',this.value)">${localStorage.getItem('notes-'+d.day)||""}</textarea>`;
-}
-
-document.querySelectorAll(".tab").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab,.panel").forEach(x=>x.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById(btn.dataset.tab).classList.add("active");
-  });
-});
-document.getElementById("resetBtn").onclick = () => {
-  if(confirm("Clear checkmarks and notes?")){
-    Object.keys(localStorage).filter(k=>k.startsWith("hm-")||k.startsWith("notes-")||k.startsWith("prep")).forEach(k=>localStorage.removeItem(k));
-    renderCalendar(); renderToday(); renderPrep();
-  }
-};
-
-renderCalendar(); renderShopping(); renderPrep(); renderToday();
-
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+const exclusions=["Seafood/Fish","Raw onion","Avocados","Mushrooms","Pistachios","Spaghetti squash","Seed oils"];
+const meals={eggToast:"3 eggs + whole-grain/sourdough toast + berries",yogurt:"Greek yogurt + berries + granola + chia seeds",eggCups:"Rainbow egg cups + berries",oatmeal:"Protein oatmeal + blueberries + chia seeds + almond butter",turkeySandwich:"Turkey sandwich + carrots + apple",chickenBowl:"Chicken rice bowl with broccoli + peppers",salad:"Big chicken salad + walnuts",chili:"Turkey chili + rice"};
+const pattern=[
+{b:meals.eggToast,l:meals.turkeySandwich,s1:"Chomps",s2:"Clean avocado-oil popcorn"},
+{b:meals.yogurt,l:meals.turkeySandwich,s1:"Apple + almond butter",s2:"Dry roasted edamame"},
+{b:meals.eggCups,l:meals.chickenBowl,s1:"Perfect Bar",s2:"Clean avocado-oil popcorn"},
+{b:meals.eggToast,l:meals.turkeySandwich,s1:"G2G Bar",s2:"Walnuts"},
+{b:meals.yogurt,l:meals.salad,s1:"Chomps",s2:"Dry roasted edamame"},
+{b:meals.eggCups,l:meals.chili,s1:"Apple + almond butter",s2:"Clean avocado-oil popcorn"},
+{b:meals.eggToast,l:meals.chickenBowl,s1:"Greek yogurt",s2:"Hard-boiled eggs"}];
+const plan=Array.from({length:30},(_,i)=>({day:i+1,...pattern[i%7]})); plan[27].b=meals.oatmeal;
+const favorites={"Breakfasts":["Eggs + toast + berries","Greek yogurt + berries + granola + chia seeds","Rainbow egg cups","Protein oatmeal, about once per month"],"Snacks":["Chomps","Perfect Bar","G2G Bar","Dry roasted edamame","Apple + almond butter","Clean avocado-oil/no-seed-oil popcorn","Hard-boiled eggs","Greek yogurt","Walnuts"],"Avoid":exclusions};
+const meds={"Breakfast":["Creatine","Vitamin D/K2","Amlodipine","Duloxetine","Pravastatin"],"Lunch":["Mesalamine"],"Evening":["Magnesium glycinate","Cortisol Manager"],"Before bed":["Melatonin"]};
+const shopping={"Protein":["Eggs: about 5 dozen/month","Chicken breast: 12–14 lb/month","Turkey breast slices: 4–5 lb/month","Lean ground turkey: 6–8 lb/month","Greek yogurt","Chomps","Perfect Bars","G2G Bars","Dry roasted edamame"],"Produce":["Blueberries","Strawberries","Apples","Romaine","Spinach","Broccoli","Bell peppers","Tomatoes","Cucumbers","Carrots","Celery","Garlic","Lemons"],"Carbs":["Whole-grain or sourdough bread","Granola","Old-fashioned oats","Brown rice","Potatoes if desired"],"Fats + Pantry":["Almond butter","Walnuts","Chia seeds","Flaxseed","Olive oil","Avocado oil","Avocado-oil mayonnaise","Mustard","Balsamic vinegar","Marinara","Clean avocado-oil/no-seed-oil popcorn","Salt, pepper, garlic powder, cinnamon"],"Supplements/Medication":["Creatine","Vitamin D/K2","Amlodipine","Duloxetine","Pravastatin","Mesalamine","Magnesium glycinate","Cortisol Manager","Melatonin"]};
+const prep=["Make 18–24 rainbow egg cups.","Hard boil 12 eggs.","Cook 3–4 lb chicken breast.","Brown 2 lb lean ground turkey for chili/bowls.","Cook a large batch of brown rice.","Wash/chop romaine, carrots, celery, peppers, cucumbers.","Portion Chomps/bars, popcorn, walnuts, and edamame.","Set out breakfast, lunch, evening, and bedtime meds/supplements."];
+const waterGoal=100;
+function todayNumber(){return((new Date()).getDate()-1)%30+1} function key(day,item){return`hm-day-${day}-${item}`} function checked(day,item){return localStorage.getItem(key(day,item))==="1"} function setChecked(day,item,val){localStorage.setItem(key(day,item),val?"1":"0")}
+function waterKey(day){return`water-${day}`} function getWater(day){return Number(localStorage.getItem(waterKey(day))||0)} function setWater(day,oz){localStorage.setItem(waterKey(day),Math.max(0,oz));renderToday()}
+function medKey(day,group,item){return`med-${day}-${group}-${item}`} function medChecked(day,group,item){return localStorage.getItem(medKey(day,group,item))==="1"} function setMed(day,group,item,val){localStorage.setItem(medKey(day,group,item),val?"1":"0");renderToday()}
+function mealBlock(day,label,text,item){return`<div class="meal"><label><input type="checkbox" ${checked(day,item)?"checked":""} onchange="setChecked(${day},'${item}',this.checked);renderToday();"><div><strong>${label}</strong><span>${text}</span></div></label></div>`}
+function dayCard(d){return`<div class="day"><h3>Day ${d.day}</h3>${mealBlock(d.day,"Breakfast",d.b,"b")}${mealBlock(d.day,"Lunch",d.l,"l")}${mealBlock(d.day,"Snack 1",d.s1,"s1")}${mealBlock(d.day,"Snack 2",d.s2,"s2")}</div>`}
+function renderCalendar(){document.getElementById("calendar").innerHTML=plan.map(dayCard).join("")}
+function renderList(id,obj){document.getElementById(id).innerHTML=Object.entries(obj).map(([section,items])=>`<div class="shop-section ${section==="Avoid"?"warning":""}"><h3>${section}</h3><ul>${items.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("")}
+function renderPrep(){document.getElementById("prepList").innerHTML=`<ul>${prep.map((x,i)=>`<li><label><input type="checkbox" ${localStorage.getItem("prep"+i)==="1"?"checked":""} onchange="localStorage.setItem('prep${i}',this.checked?'1':'0')"> ${x}</label></li>`).join("")}</ul>`}
+function medsBlock(day){return Object.entries(meds).map(([group,items])=>`<div class="shop-section"><h3>${group}</h3>${items.map(item=>`<div class="checkrow"><label><input type="checkbox" ${medChecked(day,group,item)?"checked":""} onchange="setMed(${day},'${group}','${item}',this.checked)"> <div><strong>${item}</strong><span>${group}</span></div></label></div>`).join("")}</div>`).join("")}
+function renderToday(){const d=plan[todayNumber()-1];const mealDone=["b","l","s1","s2"].filter(i=>checked(d.day,i)).length;const totalMeds=Object.values(meds).flat().length;const doneMeds=Object.entries(meds).flatMap(([g,items])=>items.map(i=>medChecked(d.day,g,i))).filter(Boolean).length;const water=getWater(d.day);
+document.getElementById("todayCard").innerHTML=`<div class="metrics"><div class="metric"><h3>Meals</h3><div class="progress"><div class="bar" style="width:${mealDone/4*100}%"></div></div><div class="muted">${mealDone}/4 checked</div></div><div class="metric"><h3>Water</h3><div class="progress"><div class="bar" style="width:${Math.min(water/waterGoal*100,100)}%"></div></div><div class="muted">${water}/${waterGoal} oz</div><div class="water-buttons"><button class="small" onclick="setWater(${d.day},getWater(${d.day})+8)">+8</button><button class="small" onclick="setWater(${d.day},getWater(${d.day})+16)">+16</button><button class="small" onclick="setWater(${d.day},getWater(${d.day})+24)">+24</button><button class="small" onclick="setWater(${d.day},0)">Reset</button></div></div><div class="metric"><h3>Meds/Supplements</h3><div class="progress"><div class="bar" style="width:${doneMeds/totalMeds*100}%"></div></div><div class="muted">${doneMeds}/${totalMeds} checked</div></div></div><h3>Day ${d.day} Meals</h3>${mealBlock(d.day,"Breakfast",d.b,"b")}${mealBlock(d.day,"Lunch",d.l,"l")}${mealBlock(d.day,"Snack 1",d.s1,"s1")}${mealBlock(d.day,"Snack 2",d.s2,"s2")}<h3>Meds / Supplements</h3><div class="shopping">${medsBlock(d.day)}</div><h3>Notes</h3><textarea placeholder="Energy, digestion, sleep, symptoms..." oninput="localStorage.setItem('notes-${d.day}',this.value)">${localStorage.getItem('notes-'+d.day)||""}</textarea>`}
+document.querySelectorAll(".tab").forEach(btn=>{btn.addEventListener("click",()=>{document.querySelectorAll(".tab,.panel").forEach(x=>x.classList.remove("active"));btn.classList.add("active");document.getElementById(btn.dataset.tab).classList.add("active")})});
+document.getElementById("resetBtn").onclick=()=>{const d=todayNumber();if(confirm("Clear today's checkmarks, water, meds/supplements, and notes?")){Object.keys(localStorage).filter(k=>k.includes(`-${d}-`)||k===waterKey(d)||k===`notes-${d}`||k.startsWith(`hm-day-${d}-`)).forEach(k=>localStorage.removeItem(k));renderCalendar();renderToday()}};
+renderCalendar();renderList("shoppingList",shopping);renderList("favoritesList",favorites);renderPrep();renderToday();
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");
