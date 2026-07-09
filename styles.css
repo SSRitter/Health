@@ -3,6 +3,7 @@
 header{display:flex;justify-content:space-between;align-items:center;padding:18px 16px;background:linear-gradient(135deg,#e9f1e5,#f8faf6);border-bottom:1px solid var(--line)}
 h1{margin:0;font-size:28px}header p{margin:2px 0 0;color:var(--muted)}h2{margin:4px 0 14px}
 button{border:0;border-radius:999px;padding:10px 14px;background:var(--accent2);color:var(--ink);font-weight:650}button.small{padding:7px 10px;font-size:14px}
+button.primary{background:var(--accent);color:white}
 nav{display:flex;gap:8px;overflow:auto;padding:10px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}.tab.active{background:var(--accent);color:white}
 main{padding:16px;max-width:1100px;margin:auto}.panel{display:none}.panel.active{display:block}
 .card,.day,.shop-section{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 1px 8px rgba(0,0,0,.04)}
@@ -12,5 +13,6 @@ main{padding:16px;max-width:1100px;margin:auto}.panel{display:none}.panel.active
 ul{padding-left:22px}textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:10px;font:inherit}
 .progress{height:12px;background:var(--accent2);border-radius:999px;overflow:hidden;margin:10px 0}.bar{height:100%;background:var(--accent);width:0%}
 .metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}.metric{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.metric h3{margin:0 0 6px;font-size:16px}
-.water-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.warning{background:var(--warn);border-color:#ead69d}
+.water-buttons,.macro-buttons{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.warning{background:var(--warn);border-color:#ead69d}
+.macro-line{font-size:13px;color:var(--muted);margin-top:6px}
 @media(max-width:600px){header{align-items:flex-start;gap:10px;flex-direction:column}h1{font-size:24px}}
